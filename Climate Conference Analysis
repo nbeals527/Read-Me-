@@ -1,0 +1,86 @@
+Climate Conference Project 
+Database: https://www.db-fiddle.com/f/pxMci1sLL945KHKYvpe9W6/1 
+
+LEFT JOIN:List all VIPs and any hotel reservations they may have.
+SELECT 
+    v.member_id,
+    v.first_name,
+    v.last_name,
+    h.hotel_name
+FROM 
+    vips v
+LEFT JOIN 
+    reservations r ON v.member_id = r.member_id
+LEFT JOIN 
+    hotels h ON r.hotel = h.hotel_id;
+
+INNER JOIN:  Show VIPs who have made reservations and include the hotel name.
+SELECT 
+    v.first_name,
+    v.last_name,
+    h.hotel_name
+FROM 
+    vips v
+INNER JOIN 
+    reservations r ON v.member_id = r.member_id
+INNER JOIN 
+    hotels h ON r.hotel = h.hotel_id;
+
+MULTIPLE JOINS:Show VIP names, event names they’re attending, and hotel names if they made a reservation.
+SELECT 
+    v.first_name,
+    v.last_name,
+    e.event_name,
+    h.hotel_name
+FROM 
+    vips v
+LEFT JOIN 
+    events e ON v.event = e.event_id
+LEFT JOIN 
+    reservations r ON v.member_id = r.member_id
+LEFT JOIN 
+    hotels h ON r.hotel = h.hotel_id;
+
+SUBQUERY:Show the names of VIPs who are giving feedback to someone who joined before 2000.
+SELECT 
+    v.first_name,
+    v.last_name
+FROM 
+    vips v
+WHERE 
+    v.provides_feedback_to IN (
+        SELECT member_id
+        FROM vips
+        WHERE member_since < 2000 );
+
+SELF JOIN:Show pairs of VIPs and the names of the people they give feedback to.
+SELECT 
+    v1.first_name || ' ' || v1.last_name AS vip_name,
+    v2.first_name || ' ' || v2.last_name AS gives_feedback_to
+FROM 
+    vips v1
+JOIN 
+    vips v2 ON v1.provides_feedback_to = v2.member_id;
+
+List all events with the count of VIPs attending.
+SELECT 
+    e.event_name,
+    COUNT(v.member_id) AS num_attendees
+FROM 
+    events e
+LEFT JOIN 
+    vips v ON e.event_id = v.event
+GROUP BY 
+    e.event_name;
+
+ Find VIPs from the 'research' association type who have RSVP'd to the welcome event.
+SELECT 
+    v.first_name,
+    v.last_name,
+    r.welcome_rsvp
+FROM 
+    vips v
+JOIN 
+    reservations r ON v.member_id = r.member_id
+WHERE 
+    v.assoc_type = 'research' AND r.welcome_rsvp = 1;
